@@ -11,14 +11,18 @@ from scipy.stats import zscore
 
 
 def hypothesis(x, theta):
-    return np.dot(np.transpose(theta),x)
+    return np.dot(np.transpose(theta), x)
+
+
+def exp_normalize(x):
+    b = x.max()
+    y = np.exp(x - b)
+    return y
 
 
 def sigmoid(x):
-
     # Activation function used to map any real value between 0 and 1
-    z = stats.zscore(x)
-    return 1 / (1 + np.exp(-z))
+    return 1 / (1 + exp_normalize(-x))
 
 
 def model_optimize(w, b, X, Y):
@@ -26,8 +30,14 @@ def model_optimize(w, b, X, Y):
     # Prediction
     final_result = sigmoid(np.dot(w, X.T) + b)
     Y_T = Y.T
-    cost = (-1 / m) * (np.sum((Y_T * np.log(final_result)) + ((1 - Y_T) * (np.log(1 - final_result)))))
-    #
+
+    ''' Here is the bug 1 - final result = [0,0,0,0...0,0,0] -> log(0) -> error so the final_result doesn't evolve '''
+
+    a = 1 - final_result
+    if a.all() != 0:
+        cost = (-1 / m) * (np.sum((Y_T * np.log(final_result)) + ((1 - Y_T) * (np.log(1 - final_result)))))
+    else:
+        cost = (-1 / m)
 
     # Gradient calculation
     dw = (1 / m) * (np.dot(X.T, (final_result - Y.T).T))
@@ -47,7 +57,7 @@ def gradientDescent(x, y, w, b, m, learning_rate, iterations=15000):
         # weight update
         w = w - (learning_rate * dw.T)
         b = b - (learning_rate * db)
-        if iteration % 100 == 0:
+        if iteration % 1500 == 0:
             costs.append(cost)
     coeff = {"w": w, "b": b}
     return coeff, costs
@@ -77,7 +87,7 @@ def getFeatures(dataset):
 def variables_initialization(features):
     alpha = 0.0001
     b = 0
-    w = np.random.uniform(0, 1, features.shape[1])
+    w = np.zeros((1, features.shape[1]))
     coeffs = []
     return alpha, b, w, coeffs
 
