@@ -6,21 +6,22 @@ from matplotlib import style
 import numpy as np
 import pandas as pd
 import sys
-
+from scipy import stats
+from scipy.stats import zscore
 
 def hypothesis(x, theta):
     return np.dot(np.transpose(theta),x)
 
 
 def sigmoid(x):
+
     # Activation function used to map any real value between 0 and 1
-    a = 1
-    return 1 / (1 + np.exp(-x))
+    z = stats.zscore(x)
+    return 1 / (1 + np.exp(-z))
 
 
 def model_optimize(w, b, X, Y):
     m = X.shape[0]
-
     # Prediction
     final_result = sigmoid(np.dot(w, X.T) + b)
     Y_T = Y.T
@@ -36,20 +37,19 @@ def model_optimize(w, b, X, Y):
     return grads, cost
 
 
-def gradientDescent(x, y, theta, m, learning_rate, iterations=1500):
-    b = 0
+def gradientDescent(x, y, w, b, m, learning_rate, iterations=1500):
     cost = []
-    w = np.zeros((1, 3))
     for iteration in range(iterations):
-        theta, cost = model_optimize(w, b, x, y)
-        theta[0] = theta["dw"]
-        theta[1] = theta["db"]
+        grads, cost = model_optimize(w, b, x, y)
+        dw = grads["dw"]
+        db = grads["db"]
         # weight update
-        w = theta[0] - (learning_rate * (theta[0].T))
-        b = theta[1] - (learning_rate * theta[1])
-    return theta, cost
+        w = w - (learning_rate * dw.T)
+        b = b - (learning_rate * db)
+    coeff = {"w": w, "b": b}
+    return coeff, cost
 
-
+"""
 def graph(features, output, theta, figure_name):
     x = []
     y = []
@@ -61,6 +61,7 @@ def graph(features, output, theta, figure_name):
     plt.scatter(x, y, output, c='g', marker='d')
     plt.show()
     plt.savefig(figure_name)
+"""
 
 
 def getFeatures(dataset):
@@ -78,7 +79,6 @@ if __name__ == '__main__':
         exit(e)
     data = dataset.dropna()
     filtered_dataset = data._get_numeric_data()
-    theta = np.random.uniform(0.0, 1.0, size=2)
     arithmancy, astronomy, herbology = getFeatures(filtered_dataset)
     houses = np.array(data['Hogwarts House'])
     house_names = ['Ravenclaw', 'Slytherin']#, 'Gryffindor', 'Hufflepuff']
@@ -87,15 +87,18 @@ if __name__ == '__main__':
     for x in houses: 
         for y in house_names: 
             if x == y: 
-                output.append(house_names.index(y) + 1)
+                output.append(house_names.index(y) + 2)
 
     features = np.asarray([[ar, ast, h] for ar, ast, h in zip(arithmancy, astronomy, herbology)])
+    features_na = np.nan_to_num(features)
     targets = np.asarray([house for house in output])
     alpha = 0.01
-    theta = np.random.uniform(0, 1, size=(features.shape[1], 1))
-    f = features.shape
-    theta, cost = gradientDescent(features[:575], targets, theta, len(targets), alpha)
-
+    b = 0
+    w = np.random.uniform(0, 1, features.shape[1])
+    coeffs = []
+    coeffs, cost = gradientDescent(features_na[:575], targets, w, b, 575, alpha)
+    print(coeffs)
+    print(cost)
     plt.plot(cost)
     plt.ylabel('cost')
     plt.xlabel('iterations (per hundreds)')
