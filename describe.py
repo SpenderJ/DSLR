@@ -3,6 +3,8 @@
 """Functional program allowing the user to visualize the numerical values of a CSV passed as an argument"""
 
 import pandas as pd
+import numpy as np
+import math
 import sys
 
 # Program
@@ -17,4 +19,43 @@ if __name__ == '__main__':
     print("Success let's go to the next step")
     filtered_dataset = dataset.dropna(axis='columns', how='all')
     filtered_dataset = filtered_dataset._get_numeric_data()
-    print(filtered_dataset)
+    features = []
+    for col in dataset.columns:
+        try:
+            float(dataset[col][0])
+            features.append(col)
+        except ValueError:
+            continue
+    info = ["Count", "Mean", "Std", "Min", "25%", "50%", "75%", "Max"]
+    df = pd.DataFrame(np.zeros(shape=(len(info), len(features))), index = info, columns = features)
+    for col_name in df.columns:
+        n = 0
+        total = 0
+        _max = - np.inf
+        _min = np.inf
+        ordered_list = []
+        for val in dataset[col_name]:
+            if np.isnan(val):
+                continue
+            else:
+                ordered_list.append(val)
+                n += 1
+                total = total + val
+                if _max < val:
+                    _max = val
+                if _min > val:
+                    _min = val
+            if n == 0:
+                df.drop(labels=col_name, axis=1)
+            else:
+                ordered_list.sort()
+                df[col_name]["Count"] = n
+                df[col_name]["Mean"] = total / n
+                df[col_name]["Max"] = _max
+                df[col_name]["Min"] = _min
+                df[col_name]["Std"] = np.nanstd(dataset[col_name])
+                df[col_name]["25%"] = ordered_list[math.ceil(n / 4) - 1]
+                df[col_name]["50%"] = ordered_list[math.ceil(n / 2) - 1]
+                df[col_name]["75%"] = ordered_list[math.ceil(3 * n / 4) - 1]
+
+    print(df)
