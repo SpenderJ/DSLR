@@ -9,6 +9,7 @@ import sys
 from scipy import stats
 from scipy.stats import zscore
 
+
 def hypothesis(x, theta):
     return np.dot(np.transpose(theta),x)
 
@@ -37,8 +38,8 @@ def model_optimize(w, b, X, Y):
     return grads, cost
 
 
-def gradientDescent(x, y, w, b, m, learning_rate, iterations=1500):
-    cost = []
+def gradientDescent(x, y, w, b, m, learning_rate, iterations=15000):
+    costs = []
     for iteration in range(iterations):
         grads, cost = model_optimize(w, b, x, y)
         dw = grads["dw"]
@@ -46,8 +47,10 @@ def gradientDescent(x, y, w, b, m, learning_rate, iterations=1500):
         # weight update
         w = w - (learning_rate * dw.T)
         b = b - (learning_rate * db)
+        if iteration % 100 == 0:
+            costs.append(cost)
     coeff = {"w": w, "b": b}
-    return coeff, cost
+    return coeff, costs
 
 """
 def graph(features, output, theta, figure_name):
@@ -68,10 +71,21 @@ def getFeatures(dataset):
     arithmancy = np.asarray(data['Arithmancy'])
     astronomy = np.asarray(data['Astronomy'])
     herbology = np.asarray(data['Herbology'])
-    return (arithmancy, astronomy, herbology)
+    return arithmancy, astronomy, herbology
+
+
+def variables_initialization(features):
+    alpha = 0.0001
+    b = 0
+    w = np.random.uniform(0, 1, features.shape[1])
+    coeffs = []
+    return alpha, b, w, coeffs
 
 
 if __name__ == '__main__':
+
+    ''' Parser '''
+
     try:
         dataset = pd.read_csv(sys.argv[1], delimiter=",")
     except Exception as e:
@@ -81,25 +95,35 @@ if __name__ == '__main__':
     filtered_dataset = data._get_numeric_data()
     arithmancy, astronomy, herbology = getFeatures(filtered_dataset)
     houses = np.array(data['Hogwarts House'])
-    house_names = ['Ravenclaw', 'Slytherin']#, 'Gryffindor', 'Hufflepuff']
-  
+    house_names = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']
+
+    ''' Parse Houses '''
+
     output = [] 
     for x in houses: 
         for y in house_names: 
             if x == y: 
                 output.append(house_names.index(y) + 2)
 
+    ''' Parse Features '''
+
     features = np.asarray([[ar, ast, h] for ar, ast, h in zip(arithmancy, astronomy, herbology)])
     features_na = np.nan_to_num(features)
     targets = np.asarray([house for house in output])
-    alpha = 0.01
-    b = 0
-    w = np.random.uniform(0, 1, features.shape[1])
-    coeffs = []
-    coeffs, cost = gradientDescent(features_na[:575], targets, w, b, 575, alpha)
-    print(coeffs)
-    print(cost)
-    plt.plot(cost)
+
+    ''' Launch Gradient '''
+
+    alpha, b, w, coeffs = variables_initialization(features)
+    coeffs, costs = gradientDescent(features_na[:1251], targets, w, b, 1251, alpha)
+
+    ''' Final prediction '''
+
+    w = coeffs["w"]
+    b = coeffs["b"]
+    print('Optimized weights', w)
+    print('Optimized intercept', b)
+
+    plt.plot(costs)
     plt.ylabel('cost')
     plt.xlabel('iterations (per hundreds)')
     plt.title('Cost reduction over time')
