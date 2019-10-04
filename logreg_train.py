@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import math
 import matplotlib.pyplot as plt
 from matplotlib import style
@@ -12,18 +14,40 @@ def hypothesis(x, theta):
 
 def sigmoid(x):
     # Activation function used to map any real value between 0 and 1
+    a = 1
     return 1 / (1 + np.exp(-x))
 
 
-def gradientDescent(x, y, theta, m, alpha, iterations=1500):
+def model_optimize(w, b, X, Y):
+    m = X.shape[0]
+
+    # Prediction
+    final_result = sigmoid(np.dot(w, X.T) + b)
+    Y_T = Y.T
+    cost = (-1 / m) * (np.sum((Y_T * np.log(final_result)) + ((1 - Y_T) * (np.log(1 - final_result)))))
+    #
+
+    # Gradient calculation
+    dw = (1 / m) * (np.dot(X.T, (final_result - Y.T).T))
+    db = (1 / m) * (np.sum(final_result - Y.T))
+
+    grads = {"dw": dw, "db": db}
+
+    return grads, cost
+
+
+def gradientDescent(x, y, theta, m, learning_rate, iterations=1500):
+    b = 0
+    cost = []
+    w = np.zeros((1, 3))
     for iteration in range(iterations):
-        for j in range(len(theta)):
-            gradient = 0
-            for i in range(m):
-                gradient += (hypothesis(x[i], theta) - y[i]) * x[i][j]
-            gradient *= 1/m
-        theta[j] = theta[j] - (alpha * gradient)
-    return theta
+        theta, cost = model_optimize(w, b, x, y)
+        theta[0] = theta["dw"]
+        theta[1] = theta["db"]
+        # weight update
+        w = theta[0] - (learning_rate * (theta[0].T))
+        b = theta[1] - (learning_rate * theta[1])
+    return theta, cost
 
 
 def graph(features, output, theta, figure_name):
@@ -57,18 +81,23 @@ if __name__ == '__main__':
     theta = np.random.uniform(0.0, 1.0, size=2)
     arithmancy, astronomy, herbology = getFeatures(filtered_dataset)
     houses = np.array(data['Hogwarts House'])
-    house_names = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']
+    house_names = ['Ravenclaw', 'Slytherin']#, 'Gryffindor', 'Hufflepuff']
   
     output = [] 
     for x in houses: 
         for y in house_names: 
             if x == y: 
-                output.append(house_names.index(y)) 
+                output.append(house_names.index(y) + 1)
 
     features = np.asarray([[ar, ast, h] for ar, ast, h in zip(arithmancy, astronomy, herbology)])
-    outputs = np.asarray([house for house in output])
+    targets = np.asarray([house for house in output])
     alpha = 0.01
-    theta = np.random.uniform(0.0, 1.0, size=3)
+    theta = np.random.uniform(0, 1, size=(features.shape[1], 1))
+    f = features.shape
+    theta, cost = gradientDescent(features[:575], targets, theta, len(targets), alpha)
 
-    theta = gradientDescent(features, outputs, theta, len(outputs), alpha)
-    graph(features, outputs, theta, 'graphPostFit')
+    plt.plot(cost)
+    plt.ylabel('cost')
+    plt.xlabel('iterations (per hundreds)')
+    plt.title('Cost reduction over time')
+    plt.show()

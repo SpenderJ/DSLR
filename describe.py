@@ -7,8 +7,6 @@ import numpy as np
 import math
 import sys
 
-# Program
-
 if __name__ == '__main__':
     try:
         dataset = pd.read_csv(sys.argv[1], delimiter=",")
@@ -16,7 +14,6 @@ if __name__ == '__main__':
         print("Can't open the file passed as argument, program will exit")
         exit(e)
 
-    print("Success let's go to the next step")
     filtered_dataset = dataset.dropna(axis='columns', how='all')
     filtered_dataset = filtered_dataset._get_numeric_data()
     features = []
