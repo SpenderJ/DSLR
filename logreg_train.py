@@ -5,18 +5,26 @@ import numpy as np
 import pandas as pd
 import sys
 
+
 def hypothesis(x, theta):
-	return np.dot(np.transpose(theta),x)
+    return np.dot(np.transpose(theta),x)
+
+
+def sigmoid(x):
+    # Activation function used to map any real value between 0 and 1
+    return 1 / (1 + np.exp(-x))
+
 
 def gradientDescent(x, y, theta, m, alpha, iterations=1500):
-	for iteration in range(iterations):
-		for j in range(len(theta)):
-			gradient = 0
-			for i in range(m):
-				gradient += (hypothesis(x[i], theta) - y[i]) * x[i][j]
-		gradient *= 1/m
-		theta[j] = theta[j] - (alpha * gradient)
-	return theta
+    for iteration in range(iterations):
+        for j in range(len(theta)):
+            gradient = 0
+            for i in range(m):
+                gradient += (hypothesis(x[i], theta) - y[i]) * x[i][j]
+            gradient *= 1/m
+        theta[j] = theta[j] - (alpha * gradient)
+    return theta
+
 
 def graph(features, output, theta, figure_name):
     x = []
@@ -27,6 +35,7 @@ def graph(features, output, theta, figure_name):
     plt.plot(features, output)
     plt.scatter(x, y, c='r', marker='o')
     plt.scatter(x, y, output, c='g', marker='d')
+    plt.show()
     plt.savefig(figure_name)
 
 
@@ -35,6 +44,7 @@ def getFeatures(dataset):
     astronomy = np.asarray(data['Astronomy'])
     herbology = np.asarray(data['Herbology'])
     return (arithmancy, astronomy, herbology)
+
 
 if __name__ == '__main__':
     try:
