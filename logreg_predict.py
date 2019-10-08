@@ -14,3 +14,4 @@ if __name__ == '__main__':
     except Exception as e:
         print("Can't open the file passed as argument, program will exit")
         exit(e)
+    print(dataset['weights'])

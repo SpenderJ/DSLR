@@ -106,14 +106,12 @@ if __name__ == '__main__':
 
     ''' Final prediction '''
 
-    print(weights)
-    w = weights[0]["w"]
     b = weights[0]["b"]
-    print(w)
-    print(b)
-
     with open("weights.csv","w+") as f:
-        f.write('weights,bias\n{0},{1}\n'.format(w, b)))
+        f.write('weights,bias\n{0},{1}\n'.format(weights[0]["w"], b))
+        f.write('{0},{1}\n'.format(weights[1]["w"], b))
+        f.write('{0},{1}\n'.format(weights[2]["w"], b))
+        f.write('{0},{1}\n'.format(weights[3]["w"], b))
     """
     print('Optimized weights', w)
     print('Optimized intercept', b)
