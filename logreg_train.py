@@ -23,9 +23,7 @@ def model_optimize(w, b, X, Y):
     error = np.mean(final_result - Y.T)
     dw = (1 / m) * (np.dot(X.T, (final_result - Y.T).T))
     db = (1 / m) * (np.sum(final_result - Y.T))
-
     grads = {"dw": dw, "db": db}
-
     return grads, cost, error
 
 
@@ -52,7 +50,6 @@ def variables_initialization(features):
     coeffs = []
     return alpha, b, w, coeffs
 
-
 # calculate column means
 def column_means(dataset):
 	means = [0 for i in range(len(dataset[0]))]
@@ -76,12 +73,13 @@ def standardize_dataset(dataset, means, stdevs):
 		for i in range(len(row)):
 			row[i] = (row[i] - means[i]) / stdevs[i]
 
-def normalize_dataset(dataset):
-    for row in dataset:
-        maxX = max(row)
-        minX = min(row)
-        for i in range(len(row)):
-            row[i] = (row[i] - maxX) / (maxX - minX)
+def getHouses(dataset):
+    houses = []
+    houses.append(dataset.iloc[:,6:][dataset['Hogwarts House'].isin(['Ravenclaw'])])
+    houses.append(dataset.iloc[:,6:][dataset['Hogwarts House'].isin(['Slytherin'])])
+    houses.append(dataset.iloc[:,6:][dataset['Hogwarts House'].isin(['Gryffindor'])])
+    houses.append(dataset.iloc[:,6:][dataset['Hogwarts House'].isin(['Hufflepuff'])])
+    return houses
 
 if __name__ == '__main__':
 
@@ -93,40 +91,27 @@ if __name__ == '__main__':
         print("Can't open the file passed as argument, program will exit")
         exit(e)
 
-    #data = dataset.dropna()
-    feats = dataset.iloc[:,6:]
-    features = np.nan_to_num(feats)
-    #normalize_dataset(features)
-    print(features)
-    means = column_means(features)
-    print(means)
-    stdevs = column_stdevs(features, means)
-    print(stdevs)
-    standardize_dataset(features, means, stdevs)
-    print(features)
-    houses = np.array(dataset['Hogwarts House'])
-    house_names = ['Ravenclaw']#, 'Slytherin', 'Gryffindor', 'Hufflepuff']
-
-    ''' Parse Houses '''
-
-    output = [] 
-    for x in houses: 
-        for y in house_names: 
-            if x == y: 
-                output.append(house_names.index(y))
-
-    ''' Parse Features '''
-
-    targets = np.asarray([house for house in output])
-    ''' Launch Gradient '''
-
-    alpha, b, w, coeffs = variables_initialization(features)
-    coeffs, costs, errors = gradientDescent(features[:443], targets, w, b, len(targets), alpha)
+    houses = getHouses(dataset)
+    costs = []
+    weights = []
+    for i in range(len(houses)):
+        features = np.nan_to_num(houses[i])
+        means = column_means(features)
+        stdevs = column_stdevs(features, means)
+        standardize_dataset(features, means, stdevs)
+        targets = np.zeros(len(features))
+        alpha, b, w, coeffs = variables_initialization(features)
+        coeffs, costs, errors = gradientDescent(features, targets, w, b, len(features), alpha)
+        weights.append(coeffs)
 
     ''' Final prediction '''
 
-    w = coeffs["w"]
-    b = coeffs["b"]
+    print(weights)
+    w = weights[0]["w"]
+    b = weights[0]["b"]
+    print(w)
+    print(b)
+    """
     print('Optimized weights', w)
     print('Optimized intercept', b)
 
@@ -136,3 +121,4 @@ if __name__ == '__main__':
     plt.xlabel('iterations (per hundreds)')
     plt.title('Cost reduction over time')
     plt.show()
+    """
