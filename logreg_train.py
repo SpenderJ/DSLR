@@ -111,6 +111,9 @@ if __name__ == '__main__':
     b = weights[0]["b"]
     print(w)
     print(b)
+
+    with open("weights.csv","w+") as f:
+        f.write('weights,bias\n{0},{1}\n'.format(w, b)))
     """
     print('Optimized weights', w)
     print('Optimized intercept', b)
