@@ -26,7 +26,6 @@ def model_optimize(w, b, X, Y):
     grads = {"dw": dw, "db": db}
     return grads, cost, error
 
-
 def gradientDescent(X, Y, w, b, m, learning_rate, iterations=15000):
     costs = []
     errors = []
@@ -73,6 +72,7 @@ def standardize_dataset(dataset, means, stdevs):
 		for i in range(len(row)):
 			row[i] = (row[i] - means[i]) / stdevs[i]
 
+''' Retrieves features for each four houses '''
 def getHouses(dataset):
     houses = []
     houses.append(dataset.iloc[:,6:][dataset['Hogwarts House'].isin(['Ravenclaw'])])
@@ -95,12 +95,17 @@ if __name__ == '__main__':
     costs = []
     weights = []
     for i in range(len(houses)):
+        ''' Standardize features '''
+
         features = np.nan_to_num(houses[i])
         means = column_means(features)
         stdevs = column_stdevs(features, means)
         standardize_dataset(features, means, stdevs)
         targets = np.zeros(len(features))
         alpha, b, w, coeffs = variables_initialization(features)
+
+        ''' Start logistic regression '''
+
         coeffs, costs, errors = gradientDescent(features, targets, w, b, len(features), alpha)
         weights.append(coeffs)
 
