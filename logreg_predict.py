@@ -44,7 +44,6 @@ if __name__ == '__main__':
     data = dataset.iloc[:,6:]
     weights = pd.read_csv("weights.csv", delimiter=",")
     w = np.asarray(weights)
-    b = -4.983864317881421 #temporary static var
 
     X = np.nan_to_num(data)
     means = column_means(X)
@@ -52,8 +51,8 @@ if __name__ == '__main__':
     standardize_dataset(X, means, stdevs)
     Y = []
     houses = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']
-    for i in range(4):
-        y_pred = sigmoid(np.dot(w[i], X.T))# + b)
+    for i in range(len(houses)):
+        y_pred = sigmoid(np.dot(w[i], X.T))
         Y.append(y_pred)
     Y_T = np.array(Y).T
 
