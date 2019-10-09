@@ -90,7 +90,7 @@ if __name__ == '__main__':
     except Exception as e:
         print("Can't open the file passed as argument, program will exit")
         exit(e)
-
+    #data = dataset.dropna()
     houses = getHouses(dataset)
     costs = []
     weights = []
@@ -105,17 +105,16 @@ if __name__ == '__main__':
         alpha, b, w, coeffs = variables_initialization(features)
 
         ''' Start logistic regression '''
-
+        
         coeffs, costs, errors = gradientDescent(features, targets, w, b, len(features), alpha)
         weights.append(coeffs)
-        
+
     ''' Final prediction '''
-    b = weights[0]['b']
-    print(b)
     with open("weights.csv","w+") as f:
         f.write('0,1,2,3,4,5,6,7,8,9,10,11,12\n')
         for i in range(len(houses)):
             np.savetxt(f, weights[i]['w'], delimiter=",")
+
     """
     print('Optimized weights', w)
     print('Optimized intercept', b)
