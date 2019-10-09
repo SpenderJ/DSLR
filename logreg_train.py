@@ -108,15 +108,14 @@ if __name__ == '__main__':
 
         coeffs, costs, errors = gradientDescent(features, targets, w, b, len(features), alpha)
         weights.append(coeffs)
-
+        
     ''' Final prediction '''
-
-    b = weights[0]["b"]
+    b = weights[0]['b']
+    print(b)
     with open("weights.csv","w+") as f:
-        f.write('weights,bias\n{0},{1}\n'.format(weights[0]["w"], b))
-        f.write('{0},{1}\n'.format(weights[1]["w"], b))
-        f.write('{0},{1}\n'.format(weights[2]["w"], b))
-        f.write('{0},{1}\n'.format(weights[3]["w"], b))
+        f.write('0,1,2,3,4,5,6,7,8,9,10,11,12\n')
+        for i in range(len(houses)):
+            np.savetxt(f, weights[i]['w'], delimiter=",")
     """
     print('Optimized weights', w)
     print('Optimized intercept', b)

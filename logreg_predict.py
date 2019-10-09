@@ -14,4 +14,7 @@ if __name__ == '__main__':
     except Exception as e:
         print("Can't open the file passed as argument, program will exit")
         exit(e)
-    print(dataset['weights'])
+    test = dataset.iloc[:,6:]
+    weights = pd.read_csv("weights.csv", delimiter=",")
+    w = np.asarray(weights)
+    b = -4.983864317881421 #temporary static var
