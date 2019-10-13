@@ -98,7 +98,11 @@ if __name__ == '__main__':
     except Exception as e:
         print("Can't open the file passed as argument, program will exit")
         exit(e)
-
+     """
+    X = data2.iloc[:,1:]
+    y = data2.iloc[:,0]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0.2)
+    """
     ''' Standardize features '''
     features = getFeatures(dataset)
     house_names = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']
