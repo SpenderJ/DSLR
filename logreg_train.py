@@ -100,7 +100,6 @@ if __name__ == '__main__':
         exit(e)
 
     ''' Standardize features '''
-
     features = getFeatures(dataset)
     house_names = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']
     houses = getHouses(dataset, house_names)
@@ -117,7 +116,6 @@ if __name__ == '__main__':
         alpha, b, w, coeffs = variables_initialization(features)
 
         ''' Start logistic regression '''
-        
         coeffs, costs, errors = gradientDescent(features, targets, w, b, len(features), alpha)
         weights.append(coeffs)
 
