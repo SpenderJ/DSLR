@@ -13,7 +13,6 @@ def sigmoid(x):
     # Activation function used to map any real value between 0 and 1
     return 1 / (1 + np.exp(-x))
 
-
 def model_optimize(w, b, X, Y):
     m = X.shape[0]
     # Prediction
@@ -73,13 +72,22 @@ def standardize_dataset(dataset, means, stdevs):
 			row[i] = (row[i] - means[i]) / stdevs[i]
 
 ''' Retrieves features for each four houses '''
-def getHouses(dataset):
+def getHouses(dataset, house_names):
     houses = []
-    houses.append(dataset.iloc[:,6:][dataset['Hogwarts House'].isin(['Ravenclaw'])])
-    houses.append(dataset.iloc[:,6:][dataset['Hogwarts House'].isin(['Slytherin'])])
-    houses.append(dataset.iloc[:,6:][dataset['Hogwarts House'].isin(['Gryffindor'])])
-    houses.append(dataset.iloc[:,6:][dataset['Hogwarts House'].isin(['Hufflepuff'])])
+    Y_= np.asarray(dataset['Hogwarts House'])
+    for x in Y_: 
+        for y in house_names: 
+            if x == y: 
+                houses.append(house_names.index(y))
     return houses
+
+def getFeatures(dataset):
+    feats = np.asarray(dataset.iloc[:,6:])
+    features = np.nan_to_num(feats)
+    means = column_means(features)
+    stdevs = column_stdevs(features, means)
+    standardize_dataset(features, means, stdevs)
+    return features
 
 if __name__ == '__main__':
 
@@ -90,18 +98,22 @@ if __name__ == '__main__':
     except Exception as e:
         print("Can't open the file passed as argument, program will exit")
         exit(e)
-    #data = dataset.dropna()
-    houses = getHouses(dataset)
+
+    ''' Standardize features '''
+
+    features = getFeatures(dataset)
+    house_names = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']
+    houses = getHouses(dataset, house_names)
     costs = []
     weights = []
-    for i in range(len(houses)):
-        ''' Standardize features '''
-
-        features = np.nan_to_num(houses[i])
-        means = column_means(features)
-        stdevs = column_stdevs(features, means)
-        standardize_dataset(features, means, stdevs)
-        targets = np.zeros(len(features))
+    for i in range(len(house_names)):
+        t = []
+        for j in houses:
+            if (j == i):
+                t.append(1)            
+            else:
+                t.append(0)
+        targets = np.asarray(t)
         alpha, b, w, coeffs = variables_initialization(features)
 
         ''' Start logistic regression '''
@@ -112,17 +124,16 @@ if __name__ == '__main__':
     ''' Final prediction '''
     with open("weights.csv","w+") as f:
         f.write('0,1,2,3,4,5,6,7,8,9,10,11,12\n')
-        for i in range(len(houses)):
+        for i in range(len(house_names)):
             np.savetxt(f, weights[i]['w'], delimiter=",")
 
-    """
-    print('Optimized weights', w)
-    print('Optimized intercept', b)
+
+    print('Optimized weights', weights)
 
     plt.plot(costs)
     plt.ylabel('cost')
-    #plt.plot(errors)
+    plt.plot(errors)
     plt.xlabel('iterations (per hundreds)')
     plt.title('Cost reduction over time')
     plt.show()
-    """
+
