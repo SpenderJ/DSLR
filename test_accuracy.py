@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 
 if __name__ == '__main__':
     pred = pd.read_csv("houses.csv", delimiter=",")
-    true = pd.read_csv("houses.csv", delimiter=",")
+    true = pd.read_csv("dataset_truth.csv", delimiter=",")
 
     #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 

@@ -25,7 +25,7 @@ def model_optimize(w, b, X, Y):
     grads = {"dw": dw, "db": db}
     return grads, cost, error
 
-def gradientDescent(X, Y, w, b, m, learning_rate, iterations=15000):
+def gradientDescent(X, Y, w, b, m, learning_rate, iterations=1500):
     costs = []
     errors = []
     for iteration in range(iterations):
@@ -35,7 +35,7 @@ def gradientDescent(X, Y, w, b, m, learning_rate, iterations=15000):
         # weight update
         w = w - (learning_rate * dw.T)
         b = b - (learning_rate * db)
-        if iteration % 150 == 0:
+        if iteration % 15 == 0:
             costs.append(cost)
             errors.append(error)
     coeff = {"w": w, "b": b}
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     except Exception as e:
         print("Can't open the file passed as argument, program will exit")
         exit(e)
-     """
+    """
     X = data2.iloc[:,1:]
     y = data2.iloc[:,0]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
