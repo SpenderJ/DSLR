@@ -27,11 +27,13 @@ def model_optimize(w, b, X, Y):
     grads = {"dw": dw, "db": db}
     return grads, cost, error
 
+
 def next_batch(X, y, batchSize):
-	# loop over our dataset `X` in mini-batches of size `batchSize`
-	for i in np.arange(0, X.shape[0], batchSize):
-		# yield a tuple of the current batched data and labels
-		yield (X[i:i + batchSize], y[i:i + batchSize])
+    """ loop over our dataset `X` in mini-batches of size `batchSize` """
+    for i in np.arange(0, X.shape[0], batchSize):
+        ''' yield a tuple of the current batched data and labels '''
+        yield (X[i:i + batchSize], y[i:i + batchSize])
+
 
 def stocashtic_gradient_descent(X, Y, w, b, m, learning_rate=0.01, iterations=10):
     costs = []
@@ -45,11 +47,12 @@ def stocashtic_gradient_descent(X, Y, w, b, m, learning_rate=0.01, iterations=10
             # weight update
             w = w - (learning_rate * dw.T)
             b = b - (learning_rate * db)
-        #if iteration % 15 == 0:
+        # if iteration % 15 == 0:
         costs.append(cost)
         errors.append(error)
     coeff = {"w": w, "b": b}
     return coeff, costs, errors
+
 
 def gradientDescent(X, Y, w, b, m, learning_rate, iterations=1500):
     costs = []
@@ -76,45 +79,53 @@ def variables_initialization(features):
     return alpha, b, w, coeffs
 
 
-# calculate column means
+''' calculate column means '''
+
+
 def column_means(dataset):
-	means = [0 for i in range(len(dataset[0]))]
-	for i in range(len(dataset[0])):
-		col_values = [row[i] for row in dataset]
-		means[i] = sum(col_values) / float(len(dataset))
-	return means
+    means = [0 for i in range(len(dataset[0]))]
+    for i in range(len(dataset[0])):
+        col_values = [row[i] for row in dataset]
+        means[i] = sum(col_values) / float(len(dataset))
+    return means
 
 
-# calculate column standard deviations
+''' calculate column standard deviations '''
+
+
 def column_stdevs(dataset, means):
-	stdevs = [0 for i in range(len(dataset[0]))]
-	for i in range(len(dataset[0])):
-		variance = [pow(row[i]-means[i], 2) for row in dataset]
-		stdevs[i] = sum(variance)
-	stdevs = [np.sqrt(x/(float(len(dataset)-1))) for x in stdevs]
-	return stdevs
+    stdevs = [0 for i in range(len(dataset[0]))]
+    for i in range(len(dataset[0])):
+        variance = [pow(row[i] - means[i], 2) for row in dataset]
+        stdevs[i] = sum(variance)
+    stdevs = [np.sqrt(x / (float(len(dataset) - 1))) for x in stdevs]
+    return stdevs
 
 
-# standardize dataset
+''' standardize dataset '''
+
+
 def standardize_dataset(dataset, means, stdevs):
-	for row in dataset:
-		for i in range(len(row)):
-			row[i] = (row[i] - means[i]) / stdevs[i]
+    for row in dataset:
+        for i in range(len(row)):
+            row[i] = (row[i] - means[i]) / stdevs[i]
 
 
 ''' Retrieves features for each four houses '''
+
+
 def getHouses(dataset, house_names):
     houses = []
-    Y_= np.asarray(dataset['Hogwarts House'])
-    for x in Y_: 
-        for y in house_names: 
-            if x == y: 
+    Y_ = np.asarray(dataset['Hogwarts House'])
+    for x in Y_:
+        for y in house_names:
+            if x == y:
                 houses.append(house_names.index(y))
     return houses
 
 
 def getFeatures(dataset):
-    feats = np.asarray(dataset.iloc[:,6:])
+    feats = np.asarray(dataset.iloc[:, 6:])
     features = np.nan_to_num(feats)
     means = column_means(features)
     stdevs = column_stdevs(features, means)
@@ -131,11 +142,6 @@ if __name__ == '__main__':
     except Exception as e:
         print("Can't open the file passed as argument, program will exit")
         exit(e)
-    """
-    X = data2.iloc[:,1:]
-    y = data2.iloc[:,0]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    """
     ''' Standardize features '''
     features = getFeatures(dataset)
     house_names = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']
@@ -146,7 +152,7 @@ if __name__ == '__main__':
         t = []
         for j in houses:
             if (j == i):
-                t.append(1)            
+                t.append(1)
             else:
                 t.append(0)
         targets = np.asarray(t)
@@ -157,11 +163,10 @@ if __name__ == '__main__':
         weights.append(coeffs)
 
     ''' Final prediction '''
-    with open("weights.csv","w+") as f:
+    with open("weights.csv", "w+") as f:
         f.write('0,1,2,3,4,5,6,7,8,9,10,11,12\n')
         for i in range(len(house_names)):
             np.savetxt(f, weights[i]['w'], delimiter=",")
-
 
     print('Optimized weights', weights)
     print('Final cost:', costs)
@@ -172,4 +177,3 @@ if __name__ == '__main__':
     plt.xlabel('iterations (per hundreds)')
     plt.title('Cost reduction over time')
     plt.show()
-
