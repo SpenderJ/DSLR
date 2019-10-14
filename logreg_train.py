@@ -27,6 +27,29 @@ def model_optimize(w, b, X, Y):
     grads = {"dw": dw, "db": db}
     return grads, cost, error
 
+def next_batch(X, y, batchSize):
+	# loop over our dataset `X` in mini-batches of size `batchSize`
+	for i in np.arange(0, X.shape[0], batchSize):
+		# yield a tuple of the current batched data and labels
+		yield (X[i:i + batchSize], y[i:i + batchSize])
+
+def stocashtic_gradient_descent(X, Y, w, b, m, learning_rate=0.01, iterations=10):
+    costs = []
+    errors = []
+    for iteration in range(iterations):
+        cost = 0.0
+        for (batchX, batchY) in next_batch(X, Y, 20):
+            grads, cost, error = model_optimize(w, b, batchX, batchY)
+            dw = grads["dw"]
+            db = grads["db"]
+            # weight update
+            w = w - (learning_rate * dw.T)
+            b = b - (learning_rate * db)
+        #if iteration % 15 == 0:
+        costs.append(cost)
+        errors.append(error)
+    coeff = {"w": w, "b": b}
+    return coeff, costs, errors
 
 def gradientDescent(X, Y, w, b, m, learning_rate, iterations=1500):
     costs = []
@@ -117,7 +140,7 @@ if __name__ == '__main__':
     features = getFeatures(dataset)
     house_names = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']
     houses = getHouses(dataset, house_names)
-    costs = []
+    cost_hist = []
     weights = []
     for i in range(len(house_names)):
         t = []
@@ -130,7 +153,7 @@ if __name__ == '__main__':
         alpha, b, w, coeffs = variables_initialization(features)
 
         ''' Start logistic regression '''
-        coeffs, costs, errors = gradientDescent(features, targets, w, b, len(features), alpha)
+        coeffs, costs, errors = stocashtic_gradient_descent(features, targets, w, b, len(features), alpha)
         weights.append(coeffs)
 
     ''' Final prediction '''
@@ -141,6 +164,7 @@ if __name__ == '__main__':
 
 
     print('Optimized weights', weights)
+    print('Final cost:', costs)
 
     plt.plot(costs)
     plt.ylabel('cost')
