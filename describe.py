@@ -23,7 +23,7 @@ if __name__ == '__main__':
             features.append(col)
         except ValueError:
             continue
-    info = ["Count", "Mean", "Std", "Min", "25%", "50%", "75%", "Max"]
+    info = ["Count", "Mean", "Std", "Min", "25%", "50%", "75%", "Max", "Unique", "Top", "Freq", "NaN"]
     df = pd.DataFrame(np.zeros(shape=(len(info), len(features))), index = info, columns = features)
     for col_name in df.columns:
         n = 0
@@ -31,8 +31,10 @@ if __name__ == '__main__':
         _max = - np.inf
         _min = np.inf
         ordered_list = []
+        count = 0
         for val in dataset[col_name]:
             if np.isnan(val):
+                count += 1
                 continue
             else:
                 ordered_list.append(val)
@@ -54,5 +56,12 @@ if __name__ == '__main__':
                 df[col_name]["25%"] = ordered_list[math.ceil(n / 4) - 1]
                 df[col_name]["50%"] = ordered_list[math.ceil(n / 2) - 1]
                 df[col_name]["75%"] = ordered_list[math.ceil(3 * n / 4) - 1]
+                df[col_name]['Unique'] = len(ordered_list)
+                temp = [[ordered_list.count(x), x] for x in set(ordered_list)]
+                temp.sort()
+                tempmax = temp[len(temp) - 1]
+                df[col_name]['Top'] = tempmax[1]
+                df[col_name]['Freq'] = tempmax[0]
+                df[col_name]['NaN'] = count
 
     print(df)
