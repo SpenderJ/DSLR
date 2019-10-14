@@ -9,9 +9,11 @@ import sys
 from scipy import stats
 from scipy.stats import zscore
 
+
 def sigmoid(x):
     # Activation function used to map any real value between 0 and 1
     return 1 / (1 + np.exp(-x))
+
 
 def model_optimize(w, b, X, Y):
     m = X.shape[0]
@@ -24,6 +26,7 @@ def model_optimize(w, b, X, Y):
     db = (1 / m) * (np.sum(final_result - Y.T))
     grads = {"dw": dw, "db": db}
     return grads, cost, error
+
 
 def gradientDescent(X, Y, w, b, m, learning_rate, iterations=1500):
     costs = []
@@ -41,12 +44,14 @@ def gradientDescent(X, Y, w, b, m, learning_rate, iterations=1500):
     coeff = {"w": w, "b": b}
     return coeff, costs, errors
 
+
 def variables_initialization(features):
     alpha = 0.01
     b = 0
     w = np.zeros((1, features.shape[1]))
     coeffs = []
     return alpha, b, w, coeffs
+
 
 # calculate column means
 def column_means(dataset):
@@ -55,7 +60,8 @@ def column_means(dataset):
 		col_values = [row[i] for row in dataset]
 		means[i] = sum(col_values) / float(len(dataset))
 	return means
- 
+
+
 # calculate column standard deviations
 def column_stdevs(dataset, means):
 	stdevs = [0 for i in range(len(dataset[0]))]
@@ -65,11 +71,13 @@ def column_stdevs(dataset, means):
 	stdevs = [np.sqrt(x/(float(len(dataset)-1))) for x in stdevs]
 	return stdevs
 
+
 # standardize dataset
 def standardize_dataset(dataset, means, stdevs):
 	for row in dataset:
 		for i in range(len(row)):
 			row[i] = (row[i] - means[i]) / stdevs[i]
+
 
 ''' Retrieves features for each four houses '''
 def getHouses(dataset, house_names):
@@ -81,6 +89,7 @@ def getHouses(dataset, house_names):
                 houses.append(house_names.index(y))
     return houses
 
+
 def getFeatures(dataset):
     feats = np.asarray(dataset.iloc[:,6:])
     features = np.nan_to_num(feats)
@@ -88,6 +97,7 @@ def getFeatures(dataset):
     stdevs = column_stdevs(features, means)
     standardize_dataset(features, means, stdevs)
     return features
+
 
 if __name__ == '__main__':
 

@@ -5,9 +5,11 @@ import numpy as np
 import pandas as pd
 import sys
 
+
 def sigmoid(x):
     # Activation function used to map any real value between 0 and 1
     return 1 / (1 + np.exp(-x))
+
 
 # calculate column means
 def column_means(dataset):
@@ -16,7 +18,8 @@ def column_means(dataset):
 		col_values = [row[i] for row in dataset]
 		means[i] = sum(col_values) / float(len(dataset))
 	return means
- 
+
+
 # calculate column standard deviations
 def column_stdevs(dataset, means):
 	stdevs = [0 for i in range(len(dataset[0]))]
@@ -25,6 +28,7 @@ def column_stdevs(dataset, means):
 		stdevs[i] = sum(variance)
 	stdevs = [np.sqrt(x/(float(len(dataset)-1))) for x in stdevs]
 	return stdevs
+
 
 # standardize dataset
 def standardize_dataset(dataset, means, stdevs):
