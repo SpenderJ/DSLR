@@ -3,6 +3,7 @@
 import math
 import matplotlib.pyplot as plt
 from matplotlib import style
+from optparse import OptionParser
 import numpy as np
 import pandas as pd
 import sys
@@ -121,21 +122,29 @@ def getFeatures(dataset):
     standardize_dataset(features, means, stdevs)
     return features
 
+def plotCost(costs, errors):
+    plt.plot(costs)
+    plt.ylabel('cost')
+    plt.plot(errors)
+    plt.xlabel('iterations (per hundreds)')
+    plt.title('Cost reduction over time')
+    plt.show()
 
 if __name__ == '__main__':
 
     ''' Parser '''
-
+    usage = "usage: %prog [options] arg"
+    parser = OptionParser(usage)
+    parser.add_option("-g", "--graph", action="store_true")
+    parser.add_option("-s", "--stocashtic", action="store_true")
+    (options, args) = parser.parse_args()
     try:
         dataset = pd.read_csv(sys.argv[1], delimiter=",")
-    except Exception as e:
-        print("Can't open the file passed as argument, program will exit")
+    except FileNotFoundError as e:
         exit(e)
-    """
-    X = data2.iloc[:,1:]
-    y = data2.iloc[:,0]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    """
+    except pd.errors.EmptyDataError as e:
+        exit(e)
+
     ''' Standardize features '''
     features = getFeatures(dataset)
     house_names = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']
@@ -153,7 +162,10 @@ if __name__ == '__main__':
         alpha, b, w, coeffs = variables_initialization(features)
 
         ''' Start logistic regression '''
-        coeffs, costs, errors = stocashtic_gradient_descent(features, targets, w, b, len(features), alpha)
+        if options.stocashtic is True:
+            coeffs, costs, errors = stocashtic_gradient_descent(features, targets, w, b, len(features), alpha)
+        else:
+            coeffs, costs, errors = gradientDescent(features, targets, w, b, len(features), alpha)
         weights.append(coeffs)
 
     ''' Final prediction '''
@@ -161,15 +173,6 @@ if __name__ == '__main__':
         f.write('0,1,2,3,4,5,6,7,8,9,10,11,12\n')
         for i in range(len(house_names)):
             np.savetxt(f, weights[i]['w'], delimiter=",")
-
-
-    print('Optimized weights', weights)
-    print('Final cost:', costs)
-
-    plt.plot(costs)
-    plt.ylabel('cost')
-    plt.plot(errors)
-    plt.xlabel('iterations (per hundreds)')
-    plt.title('Cost reduction over time')
-    plt.show()
-
+    f.close()
+    if options.graph is True:
+        plotCost(costs, errors)
