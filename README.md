@@ -9,7 +9,7 @@ This project is an introduction to DataScience, It's goal is to help you visuali
 
 ## Running the tests
 
-My project mark is : 120/125
+My project mark is : 120/100
 
 If you want to test the project, you just have to
 
