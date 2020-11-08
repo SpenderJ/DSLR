@@ -5,11 +5,11 @@
 
 DataScience x Logistic Regression, this project goal is following the Linear Regression one, to keep exploring the Machine Learning adding new tools and knowledge.
 
-The project is an introduction to DataScience, It's goal is to help you visualizating data and having a better knowlede of it before putting it into a machine learning algorithm.
+This project is an introduction to DataScience, It's goal is to help you visualizating data and having a better knowledege of it before putting it into a machine learning algorithm.
 
 ## Running the tests
 
-My project mark is : Not Graded Yet
+My project mark is : 120/125
 
 If you want to test the project, you just have to
 
